@@ -95,11 +95,16 @@ const playToggle: HTMLDivElement = document.querySelector('.play-toggle');
 
 let allFrames = [];
 for (let i = 0; i <= 240; i++) {
-  allFrames.push({
-    subject: 'circle',
+  allFrames.push([{
     x: 200,
     y: 200
-  });
+  }, {
+    x: 500,
+    y: 200
+  }{
+    x: 800,
+    y: 200
+  }]);
 }
 
 setInterval(() => {
@@ -111,16 +116,16 @@ setInterval(() => {
 }, 1000 / scrubber.getFPS());
 
 
-canvas.addEventListener('touchend', function(event) {
+canvas.addEventListener('touchend', function (event) {
   event.preventDefault();
   touches = event.touches;
 });
 
-canvas.addEventListener('touchmove', function(event) {
+canvas.addEventListener('touchmove', function (event) {
   touches = event.touches;
 });
 
-canvas.addEventListener('touchstart', function(event) {
+canvas.addEventListener('touchstart', function (event) {
   event.preventDefault();
   touches = event.touches;
 });
@@ -130,55 +135,63 @@ canvas.addEventListener('touchstart', function(event) {
   context.clearRect(0, 0, width * scaleFactor, height * scaleFactor);
 
   // draw subjects
-  const currentFrame = allFrames[scrubber.getCurrentFrame()];
-  if (currentFrame) {
-    const subjectX = currentFrame.x * scaleFactor;
-    const subjectY = currentFrame.y * scaleFactor;
-    const subjectR = 150;
+  const subjects = allFrames[scrubber.getCurrentFrame()];
+  if (subjects) {
+    for (let i = 0; i < subjects.length; i++) {
+      const subject = subjects[i];
+      const subjectX = subject.x * scaleFactor;
+      const subjectY = subject.y * scaleFactor;
+      const subjectR = 100;
 
-    // draw touches
-    for (let i = 0; i < touches.length; i++) {
-      const touch = touches[i];
+      // draw touches
+      for (let j = 0; j < touches.length; j++) {
+        const touch = touches[j];
 
-      const touchX = (touch.pageX - canvas.offsetLeft) * scaleFactor;
-      const touchY = (touch.pageY - canvas.offsetTop) * scaleFactor;
-      const touchR = 50;
+        const touchX = (touch.pageX - canvas.offsetLeft) * scaleFactor;
+        const touchY = (touch.pageY - canvas.offsetTop) * scaleFactor;
+        const touchR = 50;
 
-      const dist = Math.pow(subjectX - touchX, 2) + Math.pow(subjectY - touchY, 2);
-      const intersect = Math.pow(subjectR - touchR, 2) <= dist && dist <= Math.pow(subjectR + touchR, 2);
+        const dist = Math.pow(subjectX - touchX, 2) + Math.pow(subjectY - touchY, 2);
+        const intersect = Math.pow(subjectR - touchR, 2) <= dist && dist <= Math.pow(subjectR + touchR, 2);
 
-      if (intersect) {
-        // change pos in all future frames to avoid glitches
-        allFrames = allFrames.map((f, i) => {
-          if (i >= scrubber.getCurrentFrame()) {
-            return {
-              ...f,
-              x: touchX / scaleFactor,
-              y: touchY / scaleFactor
+        if (intersect) {
+          // change pos in all future frames to avoid glitches
+          allFrames = allFrames.map((subjects, frameIndex) => {
+            if (frameIndex >= scrubber.getCurrentFrame()) {
+              return subjects.map((s, subjectIndex) => {
+                if (subjectIndex === i) {
+                  return {
+                    x: touchX / scaleFactor,
+                    y: touchY / scaleFactor
+                  }
+                }
+
+                return s;
+              });
             }
-          }
 
-          return f;
-        });
-      } else {
-        // draw non-intersecting touches
-        // FYI this draws the touch halo 3x larger than the actual hit target size
-        context.beginPath();
-        context.arc(touchX, touchY, touchR * 3, 0, 2 * Math.PI, true);
-        context.closePath();
-        context.strokeStyle = 'rgba(0, 0, 200, 0.2)';
-        context.lineWidth = 6;
-        context.stroke();
+            return subjects;
+          });
+        } else {
+          // draw non-intersecting touches
+          // FYI this draws the touch halo 3x larger than the actual hit target size
+          context.beginPath();
+          context.arc(touchX, touchY, touchR * 3, 0, 2 * Math.PI, true);
+          context.closePath();
+          context.strokeStyle = 'rgba(0, 0, 200, 0.2)';
+          context.lineWidth = 6;
+          context.stroke();
+        }
       }
-    }
 
-    context.beginPath();
-    context.arc(currentFrame.x * scaleFactor, currentFrame.y * scaleFactor, subjectR, 0, 2 * Math.PI, true);
-    context.closePath();
-    context.fillStyle = 'rgba(0, 0, 200, 0.2)';
-    context.fill();
+      context.beginPath();
+      context.arc(subject.x * scaleFactor, subject.y * scaleFactor, subjectR, 0, 2 * Math.PI, true);
+      context.closePath();
+      context.fillStyle = 'rgba(0, 0, 200, 0.2)';
+      context.fill();
+    }
   }
-  
+
   window.requestAnimationFrame(() => renderCanvas());
 })();
 
