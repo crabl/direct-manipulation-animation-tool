@@ -1,0 +1,89 @@
+html, body {
+  width: 100vw;
+  height: 100vh;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+}
+
+.header {
+  display: flex;
+  width: 100vw;
+}
+
+.play-toggle {
+  width: 75px;
+  height: 100px;
+}
+
+.scrubber {
+  position: relative;
+  flex: 1;
+  height: 100px;
+  overflow: scroll;
+  border: 1px solid red;
+}
+
+.playhead {
+  position: fixed;
+  top: 5px;
+  left: 225px;
+  background: red;
+  height: 95px;
+  width: 5px;
+  z-index: 10;
+}
+
+.timeline {
+  display: flex;
+  position: absolute;
+  height: 80px;
+  top: 10px;
+  left: 150px;
+  padding-right: calc(100vw - 230px);
+}
+
+.frame {
+  width: 120px;
+  box-sizing: border-box;
+  height: 80px;
+  border: 1px solid black;
+  background: grey;
+}
+
+.slide {
+  // position: relative;
+  background: white;
+  box-shadow: 2px 2px 14px 3px rgba(0,0,0,0.75);
+  border-radius: 4px;
+}
+
+canvas {
+  // position: absolute;
+  // top: 20px;
+  // left: 30px;
+  border: 1px solid red;
+}
+
+// *[data-malleable=true]:hover {
+//   border: 1px solid blue;
+//   border-radius: 4px;
+// }
+
+@keyframes rotation {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(359deg);
+  }
+}
+
+.rotor {
+  border: 1px solid black;
+  width: 100px;
+  height: 100px;
+  position: absolute;
+  top: 200px;
+  animation: rotation 2s infinite linear;
+}
