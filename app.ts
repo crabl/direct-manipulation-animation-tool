@@ -23,6 +23,7 @@ class Scrubber {
   private _FPS = 24;
 
   constructor() {
+    // TODO: this should instantiate all DOM elements as well
     this._playToggle = document.querySelector('.play-toggle');
     this._playToggle.onclick = (e) => {
       if (this._isPlaying) {
@@ -86,11 +87,10 @@ class Scrubber {
 
 const scrubber = new Scrubber();
 
-
-
 const canvasOffsetLeft = canvas.offsetLeft;
 const canvasOffsetTop = canvas.offsetTop;
 
+// TODO: remove this because we only use it for debugging frame number
 const playToggle: HTMLDivElement = document.querySelector('.play-toggle');
 
 let allFrames = [];
@@ -125,7 +125,7 @@ canvas.addEventListener('touchstart', function(event) {
   touches = event.touches;
 });
 
-// main loop (HAS TO COME LAST - this is infinite duh)
+// render loop: make this a class pls
 (function renderCanvas() {
   context.clearRect(0, 0, width * scaleFactor, height * scaleFactor);
 
@@ -134,6 +134,7 @@ canvas.addEventListener('touchstart', function(event) {
   if (currentFrame) {
     const subjectX = currentFrame.x * scaleFactor;
     const subjectY = currentFrame.y * scaleFactor;
+    const subjectR = 150;
 
     // draw touches
     for (let i = 0; i < touches.length; i++) {
@@ -141,11 +142,10 @@ canvas.addEventListener('touchstart', function(event) {
 
       const touchX = (touch.pageX - canvas.offsetLeft) * scaleFactor;
       const touchY = (touch.pageY - canvas.offsetTop) * scaleFactor;
+      const touchR = 50;
 
-      const rSubject = 150;
-      const rTouch = 150;
       const dist = Math.pow(subjectX - touchX, 2) + Math.pow(subjectY - touchY, 2);
-      const intersect = Math.pow(rSubject - rTouch, 2) <= dist && dist <= Math.pow(rSubject + rTouch, 2);
+      const intersect = Math.pow(subjectR - touchR, 2) <= dist && dist <= Math.pow(subjectR + touchR, 2);
 
       if (intersect) {
         // change pos in all future frames to avoid glitches
@@ -161,9 +161,10 @@ canvas.addEventListener('touchstart', function(event) {
           return f;
         });
       } else {
-        // draw nonintersecting touch
+        // draw non-intersecting touches
+        // FYI this draws the touch halo 3x larger than the actual hit target size
         context.beginPath();
-        context.arc(touchX, touchY, 150, 0, 2 * Math.PI, true);
+        context.arc(touchX, touchY, touchR * 3, 0, 2 * Math.PI, true);
         context.closePath();
         context.strokeStyle = 'rgba(0, 0, 200, 0.2)';
         context.lineWidth = 6;
@@ -172,94 +173,13 @@ canvas.addEventListener('touchstart', function(event) {
     }
 
     context.beginPath();
-    context.arc(currentFrame.x * scaleFactor, currentFrame.y * scaleFactor, 150, 0, 2 * Math.PI, true);
+    context.arc(currentFrame.x * scaleFactor, currentFrame.y * scaleFactor, subjectR, 0, 2 * Math.PI, true);
     context.closePath();
     context.fillStyle = 'rgba(0, 0, 200, 0.2)';
     context.fill();
   }
   
-
   window.requestAnimationFrame(() => renderCanvas());
 })();
 
-
-
-const layers = [{
-  name: 'Background'
-}]
-
-/*
-var clickX = new Array();
-var clickY = new Array();
-var clickDrag = new Array();
-var paint;
-
-canvas.onmousedown = function (e: MouseEvent) {
-  console.log(e)
-  var mouseX = (e.pageX - canvas.offsetLeft) * scaleFactor;
-  var mouseY = (e.pageY - canvas.offsetTop) * scaleFactor;
-    
-  paint = true;
-  addClick(mouseX, mouseY, false);
-  redraw();
-}
-
-canvas.onmousemove = function (e: MouseEvent) {
-  var mouseX = (e.pageX - canvas.offsetLeft) * scaleFactor;
-  var mouseY = (e.pageY - canvas.offsetTop) * scaleFactor;
-
-  if (paint) {
-    addClick(mouseX, mouseY, true);
-    redraw();
-  }
-}
-
-canvas.onmouseup = function (e: MouseEvent) {
-  paint = false;
-}
-
-function addClick(x, y, dragging) {
-  clickX.push(x);
-  clickY.push(y);
-  clickDrag.push(dragging);
-}
-
-
-function redraw(){
-  context.clearRect(0, 0, context.canvas.width, context.canvas.height); // Clears the canvas
-  
-  context.strokeStyle = "#df4b26";
-  context.lineJoin = "round";
-  context.lineWidth = 5;
-      
-  for (var i=0; i < clickX.length; i++) {		
-    context.beginPath();
-    if(clickDrag[i] && i){
-      context.moveTo(clickX[i-1], clickY[i-1]);
-      }else{
-        context.moveTo(clickX[i]-1, clickY[i]);
-      }
-      context.lineTo(clickX[i], clickY[i]);
-      context.closePath();
-      context.stroke();
-  }
-}
-
-// data structure
-// pages are not malleable, but all of their children are
-// const notebook = [{
-//   page_id: 1,
-//   page_name: '1',
-//   active: true,
-//   thumbnail: '', // base64-encoded screenshot of the div?
-//   children: [{
-//     node: 'canvas'
-//   }]
-// }];
-
-
-
-
-// attach event handlers to all malleable objects in our world
-console.log(document.querySelectorAll('[data-malleable=true]'));
-*/
+// NOTHING AFTER THIS LINE WILL RUN!!!
