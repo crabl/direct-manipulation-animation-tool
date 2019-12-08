@@ -90,9 +90,6 @@ const scrubber = new Scrubber();
 const canvasOffsetLeft = canvas.offsetLeft;
 const canvasOffsetTop = canvas.offsetTop;
 
-// TODO: remove this because we only use it for debugging frame number
-const playToggle: HTMLDivElement = document.querySelector('.play-toggle');
-
 let allFrames = [];
 for (let i = 0; i <= 240; i++) {
   allFrames.push([{
@@ -111,8 +108,6 @@ setInterval(() => {
   if (scrubber.isPlaying()) {
     scrubber.incrementFrame();
   }
-
-  playToggle.innerHTML = scrubber.getCurrentFrame().toString(); // this is fking dirty
 }, 1000 / scrubber.getFPS());
 
 
