@@ -117,7 +117,6 @@ canvas.addEventListener('touchend', function(event) {
 });
 
 canvas.addEventListener('touchmove', function(event) {
-  event.preventDefault();
   touches = event.touches;
 });
 
